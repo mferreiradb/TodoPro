@@ -1,8 +1,8 @@
 const { v4 } = require('uuid');
 
 const {
-  users,
-  checksExistsUserAccount
+    users,
+    checksExistsUserAccount
 } = require('../../');
 
 let response;
@@ -10,72 +10,72 @@ let request;
 let mockNext;
 
 describe('checksExistsUserAccount', () => {
-  beforeEach(() => {
-    users.splice(0, users.length);
+    beforeEach(() => {
+        users.splice(0, users.length);
 
-    request = (params) => {
-      return {
-        ...params
-      }
-    };
+        request = (params) => {
+            return {
+                ...params
+            };
+        };
 
-    response = () => {
-      const response = {}
+        response = () => {
+            const response = {};
 
-      response.status = jest.fn((code) => {
-        return {
-          ...response,
-          statusCode: code
-        }
-      });
+            response.status = jest.fn((code) => {
+                return {
+                    ...response,
+                    statusCode: code
+                };
+            });
 
-      response.json = jest.fn((obj) => {
-        return {
-          ...response,
-          body: obj
-        }
-      });
+            response.json = jest.fn((obj) => {
+                return {
+                    ...response,
+                    body: obj
+                };
+            });
 
-      return response;
-    };
+            return response;
+        };
 
-    mockNext = jest.fn();
-  });
-
-  it('should be able to find user by username in header and pass it to request.user', () => {
-    users.push({
-      id: v4(),
-      name: 'Atlas',
-      username: 'atlas',
-      pro: false,
-      todos: []
+        mockNext = jest.fn();
     });
 
-    const mockUserSetter = jest.fn((userData) => { this.user = userData });
+    it('should be able to find user by username in header and pass it to request.user', () => {
+        users.push({
+            id: v4(),
+            name: 'Atlas',
+            username: 'atlas',
+            pro: false,
+            todos: []
+        });
 
-    const mockRequest = request({ headers: { username: 'atlas' } });
-    mockRequest.__defineSetter__('user', mockUserSetter);
+        const mockUserSetter = jest.fn((userData) => { this.user = userData; });
 
-    const mockResponse = response();
+        const mockRequest = request({ headers: { username: 'atlas' } });
+        mockRequest.__defineSetter__('user', mockUserSetter);
 
-    checksExistsUserAccount(mockRequest, mockResponse, mockNext);
+        const mockResponse = response();
 
-    expect(mockNext).toBeCalled();
-    expect(mockUserSetter).toBeCalledWith(
-      expect.objectContaining({
-        name: 'Atlas',
-        username: 'atlas',
-      })
-    );
+        checksExistsUserAccount(mockRequest, mockResponse, mockNext);
 
-  });
+        expect(mockNext).toBeCalled();
+        expect(mockUserSetter).toBeCalledWith(
+            expect.objectContaining({
+                name: 'Atlas',
+                username: 'atlas',
+            })
+        );
 
-  it('should not be able to find a non existing user by username in header', () => {
-    const mockRequest = request({ headers: { username: 'non-existing-username' } });
-    const mockResponse = response();
+    });
 
-    checksExistsUserAccount(mockRequest, mockResponse, mockNext);
+    it('should not be able to find a non existing user by username in header', () => {
+        const mockRequest = request({ headers: { username: 'non-existing-username' } });
+        const mockResponse = response();
 
-    expect(mockResponse.status).toBeCalledWith(404);
-  });
-})
+        checksExistsUserAccount(mockRequest, mockResponse, mockNext);
+
+        expect(mockResponse.status).toBeCalledWith(404);
+    });
+});

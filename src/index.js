@@ -44,7 +44,7 @@ function checksTodoExists(request, response, next) {
     }
 
     if (!isUuid) {
-        return response.status(400).json({error: 'ID is not a UUID'})
+        return response.status(400)
     }
 
     if (!todo) {
@@ -57,7 +57,14 @@ function checksTodoExists(request, response, next) {
 }
 
 function findUserById(request, response, next) {
-    // Complete aqui
+    const { id } = request.params;
+    const user = users.find((user) => user.id === id)
+
+    if (!user) {
+        return response.status(404).json({error: 'User not found'})
+    }
+    request.user = user
+    return next()
 }
 
 app.post('/users', (request, response) => {
